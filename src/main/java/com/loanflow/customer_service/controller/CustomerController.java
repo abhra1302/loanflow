@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.loanflow.customer_service.dto.CreateCustomerRequest;
 import com.loanflow.customer_service.dto.CustomerResponse;
-import com.loanflow.customer_service.entity.Customer;
 import com.loanflow.customer_service.service.CustomerService;
 
 import jakarta.validation.Valid;
