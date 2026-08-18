@@ -7,6 +7,9 @@ import com.loanflow.customer_service.dto.CreateCustomerRequest;
 import com.loanflow.customer_service.dto.CustomerResponse;
 import com.loanflow.customer_service.entity.Customer;
 import com.loanflow.customer_service.service.CustomerService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,7 +33,7 @@ public class CustomerController {
     }
 
     @PostMapping
-    public CustomerResponse createCustomer(@RequestBody CreateCustomerRequest request) {
+    public CustomerResponse createCustomer(@Valid @RequestBody CreateCustomerRequest request) {
         return customerService.createCustomer(request);
     }
     
