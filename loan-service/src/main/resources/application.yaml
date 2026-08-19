@@ -1,3 +1,12 @@
+logging:
+  level:
+    io.github.resilience4j.retry: DEBUG
+    io.github.resilience4j.circuitbreaker: DEBUG
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
 server:
   port: 8081
 spring:
@@ -12,3 +21,22 @@ spring:
       ddl-auto: update
     show-sql: true
     format_sql: true
+resilience4j:
+  circuitbreaker:
+    instances:
+      customerService:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 5
+        minimumNumberOfCalls: 3
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 2
+        ignoreExceptions:
+          - com.loanflow.loan_service.exception.CustomerNotFoundException
+  retry:
+    instances:
+      customerService:
+        maxAttempts: 3
+        waitDuration: 500ms
+        ignoreExceptions:
+          - com.loanflow.loan_service.exception.CustomerNotFoundException

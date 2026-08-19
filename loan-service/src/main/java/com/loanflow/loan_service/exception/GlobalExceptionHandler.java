@@ -29,4 +29,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
     }
 
+    @ExceptionHandler(CustomerServiceUnavailableException.class)
+    public ResponseEntity<ApiError> handleCustomerServiceUnavailableException(CustomerServiceUnavailableException ex) {
+        ApiError apiError = new ApiError("CUSTOMER_SERVICE_UNAVAILABLE", ex.getMessage(), LocalDateTime.now());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(apiError);
+    }
+
 }
