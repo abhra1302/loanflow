@@ -1,0 +1,14 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: loan-service
+  datasource:
+    url: jdbc:postgresql://localhost:5433/loandb
+    username: loan
+    password: loan
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    format_sql: true
