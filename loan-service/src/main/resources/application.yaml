@@ -37,6 +37,6 @@ resilience4j:
     instances:
       customerService:
         maxAttempts: 3
-        waitDuration: 500ms
+        waitDuration: 1s
         ignoreExceptions:
           - com.loanflow.loan_service.exception.CustomerNotFoundException

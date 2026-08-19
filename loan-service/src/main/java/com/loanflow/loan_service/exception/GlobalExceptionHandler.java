@@ -35,4 +35,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(apiError);
     }
 
+    @ExceptionHandler(LoanNotFoundException.class)
+    public ResponseEntity<ApiError> handleLoanNotFoundException(LoanNotFoundException ex) {
+        ApiError apiError = new ApiError("LOAN_NOT_FOUND", ex.getMessage(), LocalDateTime.now());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
+    }
+
 }

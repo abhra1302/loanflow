@@ -3,12 +3,15 @@ package com.loanflow.loan_service.service;
 import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.loanflow.loan_service.client.CustomerClient;
 import com.loanflow.loan_service.dto.CreateLoanRequest;
 import com.loanflow.loan_service.dto.LoanResponse;
 import com.loanflow.loan_service.entity.Loan;
 import com.loanflow.loan_service.enums.LoanStatus;
+import com.loanflow.loan_service.exception.LoanNotFoundException;
+import com.loanflow.loan_service.mapper.LoanMapper;
 import com.loanflow.loan_service.repository.LoanRepository;
 
 @Service
@@ -16,31 +19,51 @@ public class LoanService {
 
     private final LoanRepository loanRepository;
     private final CustomerClient customerClient;
+    private final LoanMapper loanMapper;
 
-    public LoanService(LoanRepository loanRepository, CustomerClient customerClient) {
+    public LoanService(LoanRepository loanRepository, CustomerClient customerClient, LoanMapper loanMapper) {
         this.loanRepository = loanRepository;
         this.customerClient = customerClient;
+        this.loanMapper = loanMapper;
     }
 
     public LoanResponse createLoan(CreateLoanRequest request) {
         customerClient.getCustomer(request.customerId());
-        Loan loan = new Loan();
-        loan.setCustomerId(request.customerId());
-        loan.setAmount(request.amount());
-        loan.setInterestRate(request.interestRate());
-        loan.setTenureMonths(request.tenureMonths());
+        // Loan loan = new Loan();
+        // loan.setCustomerId(request.customerId());
+        // loan.setAmount(request.amount());
+        // loan.setInterestRate(request.interestRate());
+        // loan.setTenureMonths(request.tenureMonths());
+        Loan loan = loanMapper.toEntity(request);
         loan.setStatus(LoanStatus.PENDING);
         loan.setCreatedAt(LocalDateTime.now());
         Loan saved = loanRepository.save(loan);
-        return new LoanResponse(
-            saved.getId(),
-            saved.getCustomerId(),
-            saved.getAmount(),
-            saved.getInterestRate(),
-            saved.getTenureMonths(),
-            saved.getStatus(),
-            saved.getCreatedAt()
-        );
+        // return new LoanResponse(
+        //     saved.getId(),
+        //     saved.getCustomerId(),
+        //     saved.getAmount(),
+        //     saved.getInterestRate(),
+        //     saved.getTenureMonths(),
+        //     saved.getStatus(),
+        //     saved.getCreatedAt()
+        // );
+        return loanMapper.toResponse(saved);
+    }
+
+    @Transactional
+    public LoanResponse getLoan(Long loanId) {
+        Loan loan = loanRepository.findById(loanId)
+                .orElseThrow(() -> new LoanNotFoundException(loanId));
+        // return new LoanResponse(
+        //     loan.getId(),
+        //     loan.getCustomerId(),
+        //     loan.getAmount(),
+        //     loan.getInterestRate(),
+        //     loan.getTenureMonths(),
+        //     loan.getStatus(),
+        //     loan.getCreatedAt()
+        // );
+        return loanMapper.toResponse(loan);
     }
 
 }

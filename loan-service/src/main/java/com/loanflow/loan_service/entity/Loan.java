@@ -23,23 +23,23 @@ public class Loan {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "customer_id")
+    @Column(name = "customer_id", nullable = false)
     private Long customerId;
-    
-    @Column(name = "amount")
+
+    @Column(name = "amount", nullable = false, precision = 15, scale = 2)
     private BigDecimal amount;
-    
-    @Column(name = "interest_rate")
+
+    @Column(name = "interest_rate", nullable = false, precision = 5, scale = 2)
     private BigDecimal interestRate;
-    
-    @Column(name = "tenure_months")
+
+    @Column(name = "tenure_months", nullable = false)
     private Integer tenureMonths;
-    
-    @Column(name = "status")
+
+    @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private LoanStatus status;
-    
-    @Column(name = "created_at")
+
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
 }
