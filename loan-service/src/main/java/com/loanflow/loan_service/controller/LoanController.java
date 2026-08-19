@@ -10,6 +10,12 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.net.URI;
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -25,13 +31,21 @@ public class LoanController {
     }
     
     @PostMapping()
-    public LoanResponse createLoan(@Valid @RequestBody CreateLoanRequest request) {
-        return loanService.createLoan(request);
+    public ResponseEntity<LoanResponse> createLoan(@Valid @RequestBody CreateLoanRequest request) {
+        LoanResponse loanResponse = loanService.createLoan(request);
+        URI location = URI.create("/loans/" + loanResponse.id());
+        return ResponseEntity.status(HttpStatus.CREATED).location(location).body(loanResponse);
     }
     
     @GetMapping("/{loanId}")
-    public LoanResponse getLoan(@PathVariable Long loanId) {
-        return loanService.getLoan(loanId);
+    public ResponseEntity<LoanResponse> getLoan(@PathVariable Long loanId) {
+        LoanResponse loanResponse = loanService.getLoan(loanId);
+        return ResponseEntity.status(HttpStatus.OK).body(loanResponse);
+    }
+
+    @GetMapping
+    public List<LoanResponse> getLoans() {
+        return loanService.getLoans();
     }
     
 }

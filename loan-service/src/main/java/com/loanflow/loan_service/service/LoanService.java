@@ -1,6 +1,7 @@
 package com.loanflow.loan_service.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,8 +36,8 @@ public class LoanService {
         // loan.setInterestRate(request.interestRate());
         // loan.setTenureMonths(request.tenureMonths());
         Loan loan = loanMapper.toEntity(request);
-        loan.setStatus(LoanStatus.PENDING);
-        loan.setCreatedAt(LocalDateTime.now());
+        // loan.setStatus(LoanStatus.PENDING);
+        // loan.setCreatedAt(LocalDateTime.now());
         Loan saved = loanRepository.save(loan);
         // return new LoanResponse(
         //     saved.getId(),
@@ -64,6 +65,13 @@ public class LoanService {
         //     loan.getCreatedAt()
         // );
         return loanMapper.toResponse(loan);
+    }
+
+    public List<LoanResponse> getLoans() {
+        return loanRepository.findAll()
+                .stream()
+                .map(loanMapper::toResponse)
+                .toList();
     }
 
 }
