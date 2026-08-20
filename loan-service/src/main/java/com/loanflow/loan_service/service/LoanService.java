@@ -46,13 +46,13 @@ public class LoanService {
         // loan.setCreatedAt(LocalDateTime.now());
         Loan saved = loanRepository.save(loan);
         // return new LoanResponse(
-        //     saved.getId(),
-        //     saved.getCustomerId(),
-        //     saved.getAmount(),
-        //     saved.getInterestRate(),
-        //     saved.getTenureMonths(),
-        //     saved.getStatus(),
-        //     saved.getCreatedAt()
+        // saved.getId(),
+        // saved.getCustomerId(),
+        // saved.getAmount(),
+        // saved.getInterestRate(),
+        // saved.getTenureMonths(),
+        // saved.getStatus(),
+        // saved.getCreatedAt()
         // );
         return loanMapper.toResponse(saved);
     }
@@ -62,13 +62,13 @@ public class LoanService {
         Loan loan = loanRepository.findById(loanId)
                 .orElseThrow(() -> new LoanNotFoundException(loanId));
         // return new LoanResponse(
-        //     loan.getId(),
-        //     loan.getCustomerId(),
-        //     loan.getAmount(),
-        //     loan.getInterestRate(),
-        //     loan.getTenureMonths(),
-        //     loan.getStatus(),
-        //     loan.getCreatedAt()
+        // loan.getId(),
+        // loan.getCustomerId(),
+        // loan.getAmount(),
+        // loan.getInterestRate(),
+        // loan.getTenureMonths(),
+        // loan.getStatus(),
+        // loan.getCreatedAt()
         // );
         return loanMapper.toResponse(loan);
     }
@@ -81,9 +81,9 @@ public class LoanService {
     }
 
     public LoanResponse updateLoan(Long loanId, UpdateLoanRequest request) {
-        Loan loan = loanRepository.findById(loanId).orElseThrow(()-> new LoanNotFoundException(loanId));
+        Loan loan = loanRepository.findById(loanId).orElseThrow(() -> new LoanNotFoundException(loanId));
 
-        if(loan.getStatus() != LoanStatus.PENDING) {
+        if (loan.getStatus() != LoanStatus.PENDING) {
             throw new LoanNotModifiableException(loanId, loan.getStatus().name());
         }
 
@@ -96,14 +96,12 @@ public class LoanService {
 
     public LoanResponse approveLoan(Long loanId) {
         return loanMapper.toResponse(
-            updateStatus(loanId, LoanStatus.APPROVED)
-    );
+                updateStatus(loanId, LoanStatus.APPROVED));
     }
 
     public LoanResponse rejectLoan(Long loanId) {
         return loanMapper.toResponse(
-            updateStatus(loanId, LoanStatus.REJECTED)
-    );
+                updateStatus(loanId, LoanStatus.REJECTED));
     }
 
     @Transactional
@@ -113,24 +111,25 @@ public class LoanService {
                 .orElseThrow(() -> new LoanNotFoundException(loanId));
 
         // if (loan.getStatus() != LoanStatus.PENDING) {
-        //     throw new LoanNotModifiableException(
-        //             loanId,
-        //             loan.getStatus().name());
+        // throw new LoanNotModifiableException(
+        // loanId,
+        // loan.getStatus().name());
         // }
 
         LoanStatus currentStatus = loan.getStatus();
 
-        boolean validTransition = switch(newStatus) {
+        boolean validTransition = switch (newStatus) {
             case LoanStatus.APPROVED, LoanStatus.REJECTED, LoanStatus.CANCELLED -> currentStatus == LoanStatus.PENDING;
             case LoanStatus.DISBURSED -> currentStatus == LoanStatus.APPROVED;
             default -> false;
         };
 
-        if(!validTransition) {
+        if (!validTransition) {
             throw new LoanNotModifiableException(
                     loanId,
                     loan.getStatus().name());
-        };
+        }
+        ;
 
         loan.setStatus(newStatus);
 
@@ -145,6 +144,29 @@ public class LoanService {
     public LoanResponse disburseLoan(Long loanId) {
         return loanMapper.toResponse(
                 updateStatus(loanId, LoanStatus.DISBURSED));
+    }
+
+    @Transactional
+    public void updateLoanWithFailure(Long loanId, UpdateLoanRequest request) {
+
+        Loan loan = loanRepository.findById(loanId)
+                .orElseThrow(() -> new LoanNotFoundException(loanId));
+
+        if (loan.getStatus() != LoanStatus.PENDING) {
+            throw new LoanNotModifiableException(
+                    loanId,
+                    loan.getStatus().name());
+        }
+
+        // First database change
+        loan.setAmount(request.amount());
+        loan.setInterestRate(request.interestRate());
+        loan.setTenureMonths(request.tenureMonths());
+
+        loanRepository.save(loan);
+
+        // Simulate something failing AFTER the update
+        throw new RuntimeException("Simulated failure");
     }
 
 }
