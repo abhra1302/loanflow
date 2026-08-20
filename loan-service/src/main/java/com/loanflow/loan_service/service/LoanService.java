@@ -111,15 +111,39 @@ public class LoanService {
         Loan loan = loanRepository.findById(loanId)
                 .orElseThrow(() -> new LoanNotFoundException(loanId));
 
-        if (loan.getStatus() != LoanStatus.PENDING) {
+        // if (loan.getStatus() != LoanStatus.PENDING) {
+        //     throw new LoanNotModifiableException(
+        //             loanId,
+        //             loan.getStatus().name());
+        // }
+
+        LoanStatus currentStatus = loan.getStatus();
+
+        boolean validTransition = switch(newStatus) {
+            case LoanStatus.APPROVED, LoanStatus.REJECTED, LoanStatus.CANCELLED -> currentStatus == LoanStatus.PENDING;
+            case LoanStatus.DISBURSED -> currentStatus == LoanStatus.APPROVED;
+            default -> false;
+        };
+
+        if(!validTransition) {
             throw new LoanNotModifiableException(
                     loanId,
                     loan.getStatus().name());
-        }
+        };
 
         loan.setStatus(newStatus);
 
         return loanRepository.save(loan);
+    }
+
+    public LoanResponse cancelLoan(Long loanId) {
+        return loanMapper.toResponse(
+                updateStatus(loanId, LoanStatus.CANCELLED));
+    }
+
+    public LoanResponse disburseLoan(Long loanId) {
+        return loanMapper.toResponse(
+                updateStatus(loanId, LoanStatus.DISBURSED));
     }
 
 }

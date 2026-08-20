@@ -70,4 +70,14 @@ public class LoanController {
         return loanService.rejectLoan(loanId);
     }
 
+    @PostMapping("/{loanId}/cancel")
+    public LoanResponse cancelLoan(@PathVariable Long loanId) {
+        return loanService.cancelLoan(loanId);
+    }
+
+    @PostMapping("/{loanId}/disburse")
+    public LoanResponse disburseLoan(@PathVariable Long loanId) {
+        return loanService.disburseLoan(loanId);
+    }
+
 }
