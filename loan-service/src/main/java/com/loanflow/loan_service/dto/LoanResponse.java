@@ -12,7 +12,8 @@ public record LoanResponse(
     BigDecimal interestRate,
     Integer tenureMonths,
     LoanStatus status,
-    LocalDateTime createdAt
+    LocalDateTime createdAt,
+    LocalDateTime updatedAt
 ) {
 
 }

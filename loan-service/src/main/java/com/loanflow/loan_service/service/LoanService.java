@@ -95,21 +95,19 @@ public class LoanService {
     }
 
     public LoanResponse approveLoan(Long loanId) {
-        Loan loan = loanRepository.findById(loanId)
-                .orElseThrow(() -> new LoanNotFoundException(loanId));
-
-        if (loan.getStatus() != LoanStatus.PENDING) {
-            throw new LoanNotModifiableException(
-                    loanId,
-                    loan.getStatus().name());
-        }
-
-        loan.setStatus(LoanStatus.APPROVED);
-
-        return loanMapper.toResponse(loanRepository.save(loan));
+        return loanMapper.toResponse(
+            updateStatus(loanId, LoanStatus.APPROVED)
+    );
     }
 
     public LoanResponse rejectLoan(Long loanId) {
+        return loanMapper.toResponse(
+            updateStatus(loanId, LoanStatus.REJECTED)
+    );
+    }
+
+    private Loan updateStatus(Long loanId, LoanStatus newStatus) {
+
         Loan loan = loanRepository.findById(loanId)
                 .orElseThrow(() -> new LoanNotFoundException(loanId));
 
@@ -119,9 +117,9 @@ public class LoanService {
                     loan.getStatus().name());
         }
 
-        loan.setStatus(LoanStatus.REJECTED);
+        loan.setStatus(newStatus);
 
-        return loanMapper.toResponse(loanRepository.save(loan));
+        return loanRepository.save(loan);
     }
 
 }
