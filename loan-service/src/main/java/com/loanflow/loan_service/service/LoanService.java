@@ -13,9 +13,11 @@ import com.loanflow.loan_service.client.CustomerClient;
 import com.loanflow.loan_service.dto.CreateLoanRequest;
 import com.loanflow.loan_service.dto.LoanResponse;
 import com.loanflow.loan_service.dto.PageResponse;
+import com.loanflow.loan_service.dto.UpdateLoanRequest;
 import com.loanflow.loan_service.entity.Loan;
 import com.loanflow.loan_service.enums.LoanStatus;
 import com.loanflow.loan_service.exception.LoanNotFoundException;
+import com.loanflow.loan_service.exception.LoanNotModifiableException;
 import com.loanflow.loan_service.mapper.LoanMapper;
 import com.loanflow.loan_service.repository.LoanRepository;
 
@@ -76,6 +78,50 @@ public class LoanService {
                 .map(loanMapper::toResponse);
         return new PageResponse<>(page.getContent(), page.getNumber(), page.getSize(), page.getTotalElements(),
                 page.getTotalPages());
+    }
+
+    public LoanResponse updateLoan(Long loanId, UpdateLoanRequest request) {
+        Loan loan = loanRepository.findById(loanId).orElseThrow(()-> new LoanNotFoundException(loanId));
+
+        if(loan.getStatus() != LoanStatus.PENDING) {
+            throw new LoanNotModifiableException(loanId, loan.getStatus().name());
+        }
+
+        loan.setAmount(request.amount());
+        loan.setInterestRate(request.interestRate());
+        loan.setTenureMonths(request.tenureMonths());
+        Loan updatedLoan = loanRepository.save(loan);
+        return loanMapper.toResponse(updatedLoan);
+    }
+
+    public LoanResponse approveLoan(Long loanId) {
+        Loan loan = loanRepository.findById(loanId)
+                .orElseThrow(() -> new LoanNotFoundException(loanId));
+
+        if (loan.getStatus() != LoanStatus.PENDING) {
+            throw new LoanNotModifiableException(
+                    loanId,
+                    loan.getStatus().name());
+        }
+
+        loan.setStatus(LoanStatus.APPROVED);
+
+        return loanMapper.toResponse(loanRepository.save(loan));
+    }
+
+    public LoanResponse rejectLoan(Long loanId) {
+        Loan loan = loanRepository.findById(loanId)
+                .orElseThrow(() -> new LoanNotFoundException(loanId));
+
+        if (loan.getStatus() != LoanStatus.PENDING) {
+            throw new LoanNotModifiableException(
+                    loanId,
+                    loan.getStatus().name());
+        }
+
+        loan.setStatus(LoanStatus.REJECTED);
+
+        return loanMapper.toResponse(loanRepository.save(loan));
     }
 
 }

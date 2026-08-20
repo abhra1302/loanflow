@@ -41,4 +41,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
     }
 
+    @ExceptionHandler(LoanNotModifiableException.class)
+    public ResponseEntity<ApiError> handleLoanNotModifiable(
+            LoanNotModifiableException ex) {
+        ApiError apiError = new ApiError("LOAN_NOT_MODIFIABLE", ex.getMessage(), LocalDateTime.now());
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(apiError);
+    }
+
 }
