@@ -2,8 +2,10 @@ package com.loanflow.loan_service.exception;
 
 import java.time.LocalDateTime;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -48,6 +50,21 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(apiError);
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<ApiError> handleOptimisticLocking(
+            ObjectOptimisticLockingFailureException ex) {
+        ApiError apiError = new ApiError("CONCURRENT_MODIFICATION", "The loan was modified by another request. Please retry.", LocalDateTime.now());
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(apiError);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiError> handleDataIntegrityViolation(
+            DataIntegrityViolationException ex) {
+        ApiError apiError = new ApiError("DATA_INTEGRITY_VIOLATION", "The request could not be completed because it violates a data constraint.", LocalDateTime.now());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
     }
 
 }

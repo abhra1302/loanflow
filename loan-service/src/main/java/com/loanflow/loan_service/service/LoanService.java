@@ -106,6 +106,7 @@ public class LoanService {
     );
     }
 
+    @Transactional
     private Loan updateStatus(Long loanId, LoanStatus newStatus) {
 
         Loan loan = loanRepository.findById(loanId)
