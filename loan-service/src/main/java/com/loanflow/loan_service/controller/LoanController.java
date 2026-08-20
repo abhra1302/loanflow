@@ -3,6 +3,7 @@ package com.loanflow.loan_service.controller;
 import org.springframework.web.bind.annotation.RestController;
 import com.loanflow.loan_service.dto.CreateLoanRequest;
 import com.loanflow.loan_service.dto.LoanResponse;
+import com.loanflow.loan_service.dto.PageResponse;
 import com.loanflow.loan_service.service.LoanService;
 
 import jakarta.validation.Valid;
@@ -12,8 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.net.URI;
-import java.util.List;
-
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,8 +46,10 @@ public class LoanController {
     }
 
     @GetMapping
-    public List<LoanResponse> getLoans() {
-        return loanService.getLoans();
+    public PageResponse<LoanResponse> getLoans(
+        @PageableDefault(size=10, sort = "createdAt", direction = Sort.Direction.DESC)
+        Pageable pageable) {
+        return loanService.getLoans(pageable);
     }
     
 }

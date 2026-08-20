@@ -3,12 +3,16 @@ package com.loanflow.loan_service.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.loanflow.loan_service.client.CustomerClient;
 import com.loanflow.loan_service.dto.CreateLoanRequest;
 import com.loanflow.loan_service.dto.LoanResponse;
+import com.loanflow.loan_service.dto.PageResponse;
 import com.loanflow.loan_service.entity.Loan;
 import com.loanflow.loan_service.enums.LoanStatus;
 import com.loanflow.loan_service.exception.LoanNotFoundException;
@@ -67,11 +71,11 @@ public class LoanService {
         return loanMapper.toResponse(loan);
     }
 
-    public List<LoanResponse> getLoans() {
-        return loanRepository.findAll()
-                .stream()
-                .map(loanMapper::toResponse)
-                .toList();
+    public PageResponse<LoanResponse> getLoans(Pageable pageable) {
+        Page<LoanResponse> page = loanRepository.findAll(pageable)
+                .map(loanMapper::toResponse);
+        return new PageResponse<>(page.getContent(), page.getNumber(), page.getSize(), page.getTotalElements(),
+                page.getTotalPages());
     }
 
 }
