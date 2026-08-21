@@ -3,7 +3,7 @@ package com.loanflow.loan_service.controller;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
-import java.math.BigDecimal;
+
 import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Test;
@@ -16,11 +16,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.loanflow.loan_service.client.CustomerClient;
-import com.loanflow.loan_service.dto.CreateLoanRequest;
 import com.loanflow.loan_service.dto.CustomerResponse;
-import com.loanflow.loan_service.dto.LoanResponse;
-import com.loanflow.loan_service.enums.LoanStatus;
- 
+
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
