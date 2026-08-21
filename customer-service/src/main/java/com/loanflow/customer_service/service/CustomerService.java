@@ -3,6 +3,7 @@ package com.loanflow.customer_service.service;
 import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.loanflow.customer_service.dto.CreateCustomerRequest;
 import com.loanflow.customer_service.dto.CustomerResponse;
@@ -47,5 +48,22 @@ public class CustomerService {
             savedCustomer.getStatus(),
             savedCustomer.getCreatedAt()
         );
+    }
+
+    @Transactional
+    public void operationThatShouldRollback(CreateCustomerRequest request) throws RuntimeException {
+
+        Customer customer = new Customer();
+        customer.setName(request.name());
+        customer.setEmail(request.email());
+        customer.setPhone(request.phone());
+        customer.setStatus(request.status());
+        customer.setCreatedAt(LocalDateTime.now());
+        Customer savedCustomer = customerRepository.save(customer);
+        savedCustomer.setName("Updated Rollback Test");
+
+        customerRepository.save(savedCustomer);
+
+        throw new RuntimeException("Simulated failure");
     }
 }

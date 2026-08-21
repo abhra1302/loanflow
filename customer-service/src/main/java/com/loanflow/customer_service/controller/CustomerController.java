@@ -36,6 +36,9 @@ public class CustomerController {
         return customerService.createCustomer(request);
     }
     
-    
+    @PostMapping("/rollback")
+    public void createCustomerRollback(@Valid @RequestBody CreateCustomerRequest request) throws RuntimeException {
+        customerService.operationThatShouldRollback(request);
+    }
     
 }
