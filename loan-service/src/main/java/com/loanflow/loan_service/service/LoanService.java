@@ -18,6 +18,8 @@ import com.loanflow.loan_service.entity.Loan;
 import com.loanflow.loan_service.enums.LoanStatus;
 import com.loanflow.loan_service.exception.LoanNotFoundException;
 import com.loanflow.loan_service.exception.LoanNotModifiableException;
+import com.loanflow.loan_service.kafka.LoanApprovedEvent;
+import com.loanflow.loan_service.kafka.LoanEventProducer;
 import com.loanflow.loan_service.mapper.LoanMapper;
 import com.loanflow.loan_service.repository.LoanRepository;
 
@@ -27,11 +29,13 @@ public class LoanService {
     private final LoanRepository loanRepository;
     private final CustomerClient customerClient;
     private final LoanMapper loanMapper;
+    private final LoanEventProducer loanEventProducer;
 
-    public LoanService(LoanRepository loanRepository, CustomerClient customerClient, LoanMapper loanMapper) {
+    public LoanService(LoanRepository loanRepository, CustomerClient customerClient, LoanMapper loanMapper, LoanEventProducer loanEventProducer) {
         this.loanRepository = loanRepository;
         this.customerClient = customerClient;
         this.loanMapper = loanMapper;
+        this.loanEventProducer = loanEventProducer;
     }
 
     public LoanResponse createLoan(CreateLoanRequest request) {
@@ -95,8 +99,18 @@ public class LoanService {
     }
 
     public LoanResponse approveLoan(Long loanId) {
-        return loanMapper.toResponse(
-                updateStatus(loanId, LoanStatus.APPROVED));
+        Loan loan = updateStatus(loanId, LoanStatus.APPROVED);
+
+        LoanApprovedEvent event = new LoanApprovedEvent(
+            loan.getId(),
+            loan.getCustomerId(),
+            loan.getAmount(),
+            LocalDateTime.now()
+        );
+        loanEventProducer.publishLoanApproved(event);
+        
+        return loanMapper.toResponse(loan);
+
     }
 
     public LoanResponse rejectLoan(Long loanId) {
