@@ -45,3 +45,6 @@ resilience4j:
         waitDuration: 1s
         ignoreExceptions:
           - com.loanflow.loan_service.exception.CustomerNotFoundException
+jwt:
+  secret: LoanFlowSuperSecretKeyForJwtSigning2026VeryLongKey
+  expiration-ms: 3600000
